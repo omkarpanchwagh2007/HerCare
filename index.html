@@ -1,0 +1,1199 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HerCare Connect — Women's Health Platform</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700;800;900&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+    <style>
+        :root {
+            --rose: #f7b4cc; --rose-deep: #ec4899; --rose-dark: #be185d; --lavender: #cdb4f0; --lavender-deep: #8b5cf6; --lavender-dark: #6d28d9;
+            --mint: #6ee7c7; --mint-deep: #10b981; --peach: #ffd0b0; --gold: #fbbf24; --sky: #7dd3fc; --sky-deep: #0ea5e9;
+            --cream: #fff7f3; --white: #ffffff; --charcoal: #3d2c33; --gray: #6b5b63; --gray-light: #f0e7ec;
+            --shadow-sm: 0 4px 16px rgba(236,72,153,0.08); --shadow-md: 0 14px 38px rgba(236,72,153,0.16); --shadow-lg: 0 26px 64px rgba(236,72,153,0.24); --shadow-glow: 0 0 28px rgba(236,72,153,0.35);
+            --radius-sm: 14px; --radius-md: 22px; --radius-lg: 30px; --radius-xl: 40px;
+            --font-heading: 'Playfair Display', Georgia, serif; --font-body: 'Inter', system-ui, sans-serif;
+            --grad-primary: linear-gradient(135deg, #ec4899, #be185d);
+            --grad-lavender: linear-gradient(135deg, #8b5cf6, #6d28d9);
+            --grad-mixed: linear-gradient(135deg, #ec4899, #8b5cf6);
+            --grad-soft: linear-gradient(135deg, #fce4ec, #f3e8ff);
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        html { scroll-behavior:smooth; }
+        body { font-family:var(--font-body); background:radial-gradient(at 0% 0%,#ffeef5 0%,transparent 45%),radial-gradient(at 100% 0%,#f3e8ff 0%,transparent 45%),radial-gradient(at 50% 100%,#fef0ef 0%,transparent 50%),var(--cream); color:var(--charcoal); min-height:100vh; overflow-x:hidden; -webkit-font-smoothing:antialiased; }
+        ::selection { background:var(--rose-deep); color:#fff; }
+        ::-webkit-scrollbar { width:12px; height:12px; }
+        ::-webkit-scrollbar-track { background:var(--gray-light); }
+        ::-webkit-scrollbar-thumb { background:var(--grad-mixed); border-radius:50px; border:3px solid var(--gray-light); }
+        ::-webkit-scrollbar-thumb:hover { background:var(--rose-dark); }
+        .bg-orbs { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:0; overflow:hidden; }
+        .bg-orb { position:absolute; border-radius:50%; filter:blur(100px); opacity:0.45; animation:orbFloat 18s infinite; }
+        .bg-orb:nth-child(1){ width:520px; height:520px; background:radial-gradient(circle,#fce4ec,#f8cdda); top:-10%; left:-8%; }
+        .bg-orb:nth-child(2){ width:420px; height:420px; background:radial-gradient(circle,#e8dff5,#d5c8eb); top:55%; right:-10%; animation-delay:-7s; }
+        .bg-orb:nth-child(3){ width:360px; height:360px; background:radial-gradient(circle,#d9f7ee,#b8ecd8); bottom:-8%; left:30%; animation-delay:-13s; }
+        @keyframes orbFloat { 0%,100%{ transform:translate(0,0) scale(1); } 25%{ transform:translate(40px,-50px) scale(1.1); } 50%{ transform:translate(-20px,-30px) scale(0.9); } 75%{ transform:translate(-35px,40px) scale(1.05); } }
+        .app-container { position:relative; z-index:1; max-width:1200px; margin:0 auto; padding:0 20px; min-height:100vh; display:flex; flex-direction:column; }
+        .navbar { display:flex; justify-content:space-between; align-items:center; padding:16px 24px; margin-top:20px; background:rgba(255,255,255,0.72); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border:1px solid rgba(255,255,255,0.6); border-radius:var(--radius-lg); box-shadow:var(--shadow-sm); flex-wrap:wrap; gap:12px; }
+        .logo { font-family:var(--font-heading); font-size:1.7rem; font-weight:800; color:var(--rose-dark); display:flex; align-items:center; gap:10px; letter-spacing:-0.5px; }
+        .logo i { width:42px; height:42px; background:var(--grad-mixed); border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; font-style:normal; font-size:1.3rem; box-shadow:var(--shadow-glow); animation:logoPulse 3s ease-in-out infinite; }
+        @keyframes logoPulse { 0%,100%{ transform:scale(1); box-shadow:0 0 22px rgba(236,72,153,0.4); } 50%{ transform:scale(1.08); box-shadow:0 0 34px rgba(236,72,153,0.6); } }
+        #navLinks { display:flex; gap:10px; flex-wrap:wrap; }
+        #navAuth { display:flex; align-items:center; gap:14px; }
+        .btn { padding:12px 24px; border-radius:50px; font-weight:600; font-size:0.95rem; cursor:pointer; border:none; transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1); display:inline-flex; align-items:center; gap:6px; text-decoration:none; position:relative; overflow:hidden; font-family:var(--font-body); }
+        .btn::after { content:''; position:absolute; top:0; left:-120%; width:60%; height:100%; background:linear-gradient(120deg,transparent,rgba(255,255,255,0.45),transparent); transform:skewX(-20deg); transition:left 0.6s ease; }
+        .btn:hover::after { left:130%; }
+        .btn-sm { padding:9px 18px; font-size:0.85rem; }
+        .btn-lg { padding:16px 34px; font-size:1.05rem; }
+        .btn-outline { background:rgba(255,255,255,0.6); border:2px solid var(--rose-deep); color:var(--rose-deep); }
+        .btn-outline:hover { background:var(--grad-primary); color:#fff; border-color:transparent; transform:translateY(-3px); box-shadow:var(--shadow-md); }
+        .btn-filled { background:var(--grad-primary); color:#fff; box-shadow:0 8px 22px rgba(236,72,153,0.3); }
+        .btn-filled:hover { transform:translateY(-3px); box-shadow:var(--shadow-glow),var(--shadow-md); filter:brightness(1.08); }
+        .btn-lavender { background:var(--grad-lavender); color:#fff; box-shadow:0 8px 22px rgba(139,92,246,0.3); }
+        .btn-lavender:hover { transform:translateY(-3px); box-shadow:0 0 28px rgba(139,92,246,0.45),var(--shadow-md); filter:brightness(1.08); }
+        .hero { display:flex; align-items:center; justify-content:space-between; padding:60px 0; flex-wrap:wrap; gap:40px; }
+        .hero-content { flex:1 1 420px; }
+        .hero-content h1 { font-family:var(--font-heading); font-size:clamp(2.5rem,6vw,3.8rem); font-weight:800; line-height:1.15; margin-bottom:20px; letter-spacing:-1px; }
+        .hero-content h1 span { background:var(--grad-mixed); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; display:inline-block; }
+        .hero-content p { font-size:1.2rem; color:var(--gray); max-width:450px; line-height:1.6; }
+        .hero-image { flex:1 1 320px; display:flex; justify-content:center; }
+        .hero-image img { max-width:100%; height:auto; animation:heroFloat 6s ease-in-out infinite; filter:drop-shadow(0 20px 40px rgba(236,72,153,0.25)); }
+        @keyframes heroFloat { 0%,100%{ transform:translateY(0) rotate(0deg); } 50%{ transform:translateY(-18px) rotate(2deg); } }
+        .features { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:24px; margin:60px 0; }
+        .feature-card { background:rgba(255,255,255,0.85); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,0.7); border-radius:var(--radius-lg); padding:36px 28px; box-shadow:var(--shadow-sm); transition:all 0.4s cubic-bezier(0.34,1.56,0.64,1); text-align:center; position:relative; overflow:hidden; }
+        .feature-card::before { content:''; position:absolute; top:0; left:0; right:0; height:5px; background:var(--grad-mixed); transform:scaleX(0); transform-origin:left; transition:transform 0.4s ease; }
+        .feature-card:hover { transform:translateY(-10px); box-shadow:var(--shadow-lg); }
+        .feature-card:hover::before { transform:scaleX(1); }
+        .feature-card h3 { font-family:var(--font-heading); font-size:1.4rem; margin:14px 0 10px; color:var(--rose-dark); }
+        .feature-card p { color:var(--gray); line-height:1.6; }
+        .feature-card strong { display:block; margin-top:12px; color:var(--lavender-deep); font-weight:700; }
+        .feature-icon { width:76px; height:76px; margin:0 auto 8px; border-radius:22px; background:var(--grad-soft); display:flex; align-items:center; justify-content:center; font-size:2.2rem; box-shadow:0 8px 20px rgba(236,72,153,0.18); transition:transform 0.4s ease; }
+        .feature-card:hover .feature-icon { transform:rotate(-8deg) scale(1.1); }
+        .modal-overlay { position:fixed; inset:0; background:rgba(30,15,20,0.55); z-index:100; display:none; align-items:center; justify-content:center; backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); padding:20px; }
+        .modal-overlay.active { display:flex; animation:fadeIn 0.3s ease; }
+        @keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
+        .modal { background:#fff; border-radius:var(--radius-xl); width:90%; max-width:800px; max-height:90vh; overflow-y:auto; display:flex; flex-wrap:wrap; position:relative; box-shadow:var(--shadow-lg); animation:modalPop 0.4s cubic-bezier(0.34,1.56,0.64,1); }
+        @keyframes modalPop { from{opacity:0; transform:scale(0.9) translateY(20px);} to{opacity:1; transform:scale(1) translateY(0);} }
+        .info-panel { flex:1 1 300px; background:var(--grad-soft); padding:44px 36px; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; }
+        .info-panel h2 { font-family:var(--font-heading); font-size:2rem; color:var(--rose-dark); margin-bottom:10px; }
+        .info-panel p { color:var(--gray); }
+        .form-panel { flex:1 1 300px; padding:44px 36px; }
+        .form-panel h2 { font-family:var(--font-heading); font-size:1.6rem; color:var(--charcoal); margin-bottom:22px; }
+        .form-panel a { color:var(--rose-deep); font-weight:700; text-decoration:none; }
+        .form-panel a:hover { text-decoration:underline; }
+        .close-btn { position:absolute; top:16px; right:16px; width:38px; height:38px; background:rgba(255,255,255,0.9); border:none; border-radius:50%; font-size:1.2rem; cursor:pointer; color:var(--gray); z-index:5; transition:all 0.3s ease; box-shadow:var(--shadow-sm); }
+        .close-btn:hover { background:var(--rose-deep); color:#fff; transform:rotate(90deg); }
+        .form-group { margin-bottom:20px; }
+        .form-group label { font-weight:600; display:block; margin-bottom:8px; color:var(--charcoal); font-size:0.9rem; }
+        .form-group input, .form-group select, .form-group textarea { width:100%; padding:12px 16px; border:2px solid var(--gray-light); border-radius:var(--radius-sm); font-size:0.95rem; font-family:var(--font-body); background:#fff; color:var(--charcoal); transition:all 0.3s ease; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline:none; border-color:var(--rose-deep); box-shadow:0 0 0 4px rgba(236,72,153,0.12); }
+        .dashboard { display:none; padding:20px 0; }
+        .dashboard.active { display:flex; flex-direction:column; animation:fadeIn 0.4s ease; }
+        .dash-header { display:flex; justify-content:space-between; align-items:center; padding:22px 26px; background:var(--grad-soft); border:1px solid rgba(255,255,255,0.7); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); border-radius:var(--radius-lg); margin-bottom:20px; box-shadow:var(--shadow-sm); flex-wrap:wrap; gap:10px; font-weight:600; }
+        .dash-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:18px; margin-top:20px; }
+        .dash-card { background:rgba(255,255,255,0.85); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,0.7); border-radius:var(--radius-lg); padding:26px 22px; box-shadow:var(--shadow-sm); cursor:pointer; transition:all 0.35s cubic-bezier(0.34,1.56,0.64,1); position:relative; overflow:hidden; }
+        .dash-card::before { content:''; position:absolute; left:0; top:0; bottom:0; width:5px; background:var(--grad-mixed); transform:scaleY(0); transform-origin:top; transition:transform 0.35s ease; }
+        .dash-card:hover { transform:translateY(-6px); box-shadow:var(--shadow-md); background:rgba(255,255,255,0.95); }
+        .dash-card:hover::before { transform:scaleY(1); }
+        .dash-card h4 { font-size:1.05rem; font-weight:700; color:var(--charcoal); }
+        .subview-card { background:rgba(255,255,255,0.9); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); border:1px solid rgba(255,255,255,0.7); border-radius:var(--radius-xl); padding:30px 34px; box-shadow:var(--shadow-md); margin-bottom:24px; animation:fadeIn 0.4s ease; }
+        .subview-card h3 { font-family:var(--font-heading); font-size:1.5rem; color:var(--rose-dark); margin-bottom:18px; }
+        .subview-card h4 { font-family:var(--font-heading); color:var(--charcoal); margin-bottom:10px; }
+        .subview-card p { color:var(--gray); line-height:1.6; margin-bottom:10px; }
+        .subview-card strong { color:var(--rose-deep); }
+        .subview-card select { width:100%; max-width:320px; padding:12px 16px; border:2px solid var(--gray-light); border-radius:var(--radius-sm); font-size:0.95rem; margin-bottom:16px; background:#fff; color:var(--charcoal); font-family:var(--font-body); }
+        .subview-card select:focus { outline:none; border-color:var(--rose-deep); box-shadow:0 0 0 4px rgba(236,72,153,0.12); }
+        .subview-card a { color:var(--rose-deep); font-weight:700; text-decoration:none; }
+        .slot-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(100px,1fr)); gap:10px; margin:14px 0; }
+        .slot-btn { padding:12px; border:2px solid var(--gray-light); border-radius:var(--radius-sm); background:#fff; cursor:pointer; font-weight:600; text-align:center; transition:all 0.25s ease; color:var(--charcoal); }
+        .slot-btn:hover { border-color:var(--rose); background:#fff5f9; transform:translateY(-2px); }
+        .slot-btn.selected { background:var(--grad-primary); color:#fff; border-color:transparent; box-shadow:0 6px 16px rgba(236,72,153,0.35); transform:translateY(-2px); }
+        .timeline { position:relative; padding-left:40px; }
+        .timeline::before { content:''; position:absolute; left:19px; top:0; bottom:0; width:3px; background:var(--grad-mixed); border-radius:3px; }
+        .timeline-item { position:relative; margin-bottom:22px; padding:20px 24px; background:#fff; border-radius:var(--radius-md); box-shadow:var(--shadow-sm); border-left:5px solid var(--rose-deep); transition:all 0.3s ease; }
+        .timeline-item:hover { transform:translateX(6px); box-shadow:var(--shadow-md); }
+        .timeline-item::before { content:''; position:absolute; left:-28px; top:24px; width:14px; height:14px; border-radius:50%; background:var(--grad-mixed); border:3px solid #fff; box-shadow:0 0 0 3px rgba(236,72,153,0.2); }
+        .timeline-item.major { border-left-color:var(--lavender-deep); }
+        .timeline-item.major::before { background:var(--grad-lavender); box-shadow:0 0 0 3px rgba(139,92,246,0.2); }
+        .timeline-item > div { color:var(--gray); line-height:1.5; }
+        .timeline-item > div:first-child { font-size:0.8rem; color:var(--rose-deep); font-weight:600; margin-bottom:4px; }
+        .timeline-item strong { color:var(--charcoal); font-size:1.05rem; }
+        .goal-list { list-style:none; display:flex; flex-direction:column; gap:12px; }
+        .goal-item { display:flex; align-items:center; gap:16px; padding:16px 20px; background:#fff; border-radius:var(--radius-md); box-shadow:var(--shadow-sm); cursor:pointer; transition:all 0.3s ease; border:1px solid transparent; }
+        .goal-item:hover { transform:translateX(6px); box-shadow:var(--shadow-md); border-color:var(--rose); }
+        .goal-checkbox { width:30px; height:30px; border-radius:50%; border:2.5px solid #d9cfd5; display:flex; align-items:center; justify-content:center; color:transparent; flex-shrink:0; transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1); }
+        .goal-item.done { background:linear-gradient(135deg,#f0fdf9,#e6fbf3); }
+        .goal-item.done .goal-checkbox { background:linear-gradient(135deg,#10b981,#059669); border-color:transparent; color:#fff; transform:scale(1.1); }
+        .goal-item.done span { text-decoration:line-through; color:var(--gray); }
+        .chat-messages { max-height:320px; overflow-y:auto; background:linear-gradient(135deg,#faf6f9,#f5f0fa); border-radius:var(--radius-md); padding:18px; margin-bottom:16px; border:1px solid var(--gray-light); }
+        .chat-bubble { margin-bottom:10px; padding:12px 16px; border-radius:20px; max-width:75%; word-wrap:break-word; line-height:1.5; animation:bubbleIn 0.3s ease; }
+        @keyframes bubbleIn { from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);} }
+        .chat-bubble strong { display:block; margin-bottom:2px; }
+        .chat-bubble small { opacity:0.7; font-size:0.72rem; }
+        .chat-bubble.sent { background:var(--grad-primary); color:#fff; margin-left:auto; border-bottom-right-radius:6px; box-shadow:0 4px 12px rgba(236,72,153,0.25); }
+        .chat-bubble.received { background:#fff; color:var(--charcoal); border-bottom-left-radius:6px; box-shadow:var(--shadow-sm); border:1px solid var(--gray-light); }
+        .toast { position:fixed; bottom:30px; right:30px; background:var(--grad-primary); color:#fff; padding:14px 26px; border-radius:50px; font-weight:600; z-index:999; box-shadow:var(--shadow-md); animation:toastIn 0.4s cubic-bezier(0.34,1.56,0.64,1); }
+        @keyframes toastIn { from{opacity:0; transform:translateY(20px) scale(0.9);} to{opacity:1; transform:translateY(0) scale(1);} }
+        .doctor-option { transition:all 0.25s ease; border:1px solid var(--gray-light) !important; }
+        .doctor-option:hover { transform:translateX(4px); box-shadow:var(--shadow-sm); border-color:var(--rose) !important; }
+        input[type="date"] { font-family:var(--font-body); color:var(--charcoal); cursor:pointer; }
+        input[type="date"]:focus { outline:none; border-color:var(--rose-deep) !important; box-shadow:0 0 0 4px rgba(236,72,153,0.12); }
+        @media (max-width:640px) { .hero{ padding:30px 0; } .stats{ padding:24px 12px; gap:16px; } .stat:not(:last-child)::after{ display:none; } .info-panel,.form-panel{ padding:30px 24px; } .subview-card{ padding:22px 18px; } .toast{ right:16px; left:16px; text-align:center; } }
+    </style>
+</head>
+<body>
+<div class="bg-orbs"><div class="bg-orb"></div><div class="bg-orb"></div><div class="bg-orb"></div></div>
+<div class="app-container" id="appContainer">
+    <nav class="navbar" id="navbar">
+        <div class="logo"><i>🌸</i> HerCare Connect</div>
+        <div id="navLinks">
+            <button class="btn btn-outline btn-sm" onclick="openModal('patientLogin')">🩺 Patient Login</button>
+            <button class="btn btn-lavender btn-sm" onclick="openModal('doctorLogin')">👩‍⚕️ Doctor Login</button>
+            <button class="btn btn-filled btn-sm" onclick="openModal('patientRegister')">✨ Join as Patient</button>
+        </div>
+        <div id="navAuth" style="display:none;">
+            <span id="navUserLabel" style="font-weight:600;"></span>
+            <button class="btn btn-outline btn-sm" onclick="logout()">Logout</button>
+        </div>
+    </nav>
+    <div id="homeContent">
+        <div class="hero">
+            <div class="hero-content">
+                <h1>Your Health, <span>Beautifully Supported</span></h1>
+                <p style="font-size:1.2rem;color:var(--gray);max-width:450px;">A secure platform connecting women with specialist doctors for pregnancy, menstrual health, and holistic wellness.</p>
+                <div style="margin-top:30px;display:flex;gap:16px;">
+                    <button class="btn btn-filled btn-lg" onclick="openModal('patientRegister')">✨ Get Started</button>
+                    <button class="btn btn-outline btn-lg" onclick="openModal('doctorRegister')">👩‍⚕️ For Doctors</button>
+                </div>
+            </div>
+            <div class="hero-image">
+                <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'%3E%3Ccircle cx='200' cy='150' r='130' fill='%23fce4ec'/%3E%3Ccircle cx='200' cy='150' r='80' fill='%23f8cdda'/%3E%3Ctext x='200' y='170' font-size='70' text-anchor='middle' fill='%23d4788f'%3E🌸%3C/text%3E%3C/svg%3E" alt="health illustration">
+            </div>
+        </div>
+        <div class="features">
+            <div class="feature-card"><div class="feature-icon">📋</div><h3>Health Roadmap</h3><p>Visual timeline of consultations, medications, and personal notes.</p></div>
+            <div class="feature-card"><div class="feature-icon">📁</div><h3>Document Vault</h3><p>Upload and view test reports instantly.</p></div>
+            <div class="feature-card"><div class="feature-icon">🎯</div><h3>Daily Tracker</h3><p>Doctor-assigned goals with satisfying checkboxes.</p></div>
+            <div class="feature-card"><div class="feature-icon">📹</div><h3>Video Consult</h3><p>Secure in-browser calls for follow‑ups.</p></div>
+        </div>
+        <div style="display:flex;gap:24px;flex-wrap:wrap;justify-content:center;margin:60px 0;">
+            <div class="feature-card"><p>"HerCare made my pregnancy journey so organized!"</p><strong>— Ananya</strong></div>
+            <div class="feature-card"><p>"I can review histories and approve appointments in seconds."</p><strong>— Dr. Priya</strong></div>
+        </div>
+        <div style="text-align:center;padding:40px 20px;">
+            <h2 style="font-family:var(--font-heading);">Ready to begin?</h2>
+            <button class="btn btn-filled btn-lg" onclick="openModal('patientRegister')">🌸 Join HerCare Today</button>
+        </div>
+    </div>
+    <div class="dashboard" id="patientDashboard">
+        <div class="dash-header"><span>👋 Welcome, <span id="patientName"></span></span><span id="currentDate"></span></div>
+        <div class="dash-grid">
+            <div class="dash-card" onclick="showTimeline()"><h4>📋 Health Roadmap</h4></div>
+            <div class="dash-card" onclick="showDocuments()"><h4>📁 Document Vault</h4></div>
+            <div class="dash-card" onclick="showProgress()"><h4>🎯 Daily Tracker</h4></div>
+            <div class="dash-card" onclick="showAppointments()"><h4>📅 Appointments</h4></div>
+            <div class="dash-card" onclick="showVideoCall()"><h4>📹 Video Consult</h4></div>
+            <div class="dash-card" onclick="showConnections()"><h4>🤝 My Doctor</h4></div>
+            <div class="dash-card" onclick="showChat()"><h4>💬 Chat</h4></div>
+        </div>
+        <div id="patientSubView" style="margin-top:24px;"></div>
+    </div>
+    <div class="dashboard" id="doctorDashboard">
+        <div class="dash-header"><span>👩‍⚕️ Welcome, Dr. <span id="doctorName"></span> (ID: <span id="doctorIdDisplay"></span>)</span><span id="currentDateDoc"></span></div>
+        <div class="dash-grid">
+            <div class="dash-card" onclick="showTimelineDoc()"><h4>📋 Patient History</h4></div>
+            <div class="dash-card" onclick="showDocumentsDoc()"><h4>📁 Documents</h4></div>
+            <div class="dash-card" onclick="showProgressDoc()"><h4>🎯 Patient Goals</h4></div>
+            <div class="dash-card" onclick="showAppointmentsDoc()"><h4>📅 Appointments</h4></div>
+            <div class="dash-card" onclick="showVideoCall()"><h4>📹 Video Follow‑Up</h4></div>
+            <div class="dash-card" onclick="showConnectionsDoc()"><h4>🤝 My Patients</h4></div>
+            <div class="dash-card" onclick="showChatDoc()"><h4>💬 Chat</h4></div>
+        </div>
+        <div id="doctorSubView" style="margin-top:24px;"></div>
+    </div>
+</div>
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this) closeModal()">
+    <div class="modal" id="modalContent"></div>
+</div>
+<div id="toastContainer"></div>
+<script>
+// ================= EMAIL OTP CONFIGURATION =================
+// Replace these 3 values with the values from your EmailJS dashboard.
+const EMAILJS_PUBLIC_KEY = "R12waEWWSLGE5aJ4N";
+const EMAILJS_SERVICE_ID = "service_jrqyjlf";
+const EMAILJS_TEMPLATE_ID = "template_z0s9acd";
+
+emailjs.init({
+    publicKey: EMAILJS_PUBLIC_KEY,
+    limitRate: { id: "hercare-otp", throttle: 60000 }
+});
+const STATE = {
+    currentUser: null,
+    patients: JSON.parse(localStorage.getItem('hc_patients')||'[]'),
+    doctors: JSON.parse(localStorage.getItem('hc_doctors')||'[]'),
+    otpStore: {},
+    history: JSON.parse(localStorage.getItem('hc_history')||'[]'),
+    documents: JSON.parse(localStorage.getItem('hc_documents')||'[]'),
+    goals: JSON.parse(localStorage.getItem('hc_goals')||'[]'),
+    appointments: JSON.parse(localStorage.getItem('hc_appointments')||'[]'),
+    connections: JSON.parse(localStorage.getItem('hc_connections')||'[]'),
+    chatMessages: JSON.parse(localStorage.getItem('hc_chat')||'[]'),
+};
+/* ================= REALTIME CLOUD SYNC (multi-device, instant) ================= */
+const CLOUD_URL='https://dkpkqmwokeofggwivstf.supabase.co/rest/v1/hc_store';
+const CLOUD_BASE='https://dkpkqmwokeofggwivstf.supabase.co';
+const CLOUD_KEY='sb_publishable_61gjPjv9Uq50DKcDypN9UQ_6r3Jyio1';
+const LS_KEY={patients:'hc_patients',doctors:'hc_doctors',history:'hc_history',documents:'hc_documents',goals:'hc_goals',appointments:'hc_appointments',connections:'hc_connections',chatMessages:'hc_chat'};
+const SYNC_KEYS=Object.keys(LS_KEY);
+const lastLocalWrite={};
+const DEVICE_ID=(function(){ let d=localStorage.getItem('hc_device_id'); if(!d){ d='dev_'+Math.random().toString(36).slice(2)+Date.now().toString(36); localStorage.setItem('hc_device_id',d);} return d; })();
+function recordId(k,it){
+    if(!it||typeof it!=='object') return JSON.stringify(it);
+    switch(k){
+        case 'patients': case 'doctors': return String(it.email||'').toLowerCase();
+        case 'connections': case 'appointments': return it.id||JSON.stringify(it);
+        case 'goals': return String(it.email||'')+'|'+String(it.date||'');
+        case 'chatMessages': return it.id||JSON.stringify(it);
+        default: return it.id||JSON.stringify(it);
+    }
+}
+function mergeLists(k,localArr,remoteArr,preferLocal){
+    const map=new Map();
+    const first=preferLocal?remoteArr:localArr, second=preferLocal?localArr:remoteArr;
+    (first||[]).forEach(it=>map.set(recordId(k,it),it));
+    (second||[]).forEach(it=>map.set(recordId(k,it),it));
+    return Array.from(map.values());
+}
+/* ---- local tab-to-tab channel (same device, 0 ms) ---- */
+let localChannel=null;
+try{ localChannel=new BroadcastChannel('hc_sync'); }catch(e){}
+/* ---- realtime websocket channel (device-to-device, ~50 ms) ---- */
+let rtClient=null, rtChannel=null, rtReady=false;
+function initRealtime(){
+    try{
+        if(!window.supabase||!window.supabase.createClient) return;
+        rtClient=window.supabase.createClient(CLOUD_BASE,CLOUD_KEY,{auth:{persistSession:false},realtime:{params:{eventsPerSecond:40}}});
+        rtChannel=rtClient.channel('hercare_live_v1',{config:{broadcast:{self:false,ack:false}}});
+        rtChannel.on('broadcast',{event:'sync'},(msg)=>{ applyRemote(msg.payload); });
+        rtChannel.on('broadcast',{event:'ping'},()=>{ cloudPushAll(true); });
+        rtChannel.subscribe((status)=>{
+            rtReady=(status==='SUBSCRIBED');
+            const dot=document.getElementById('liveDot');
+            if(dot){ dot.style.background=rtReady?'#10b981':'#f59e0b'; dot.title=rtReady?'Live sync connected':'Reconnecting...'; }
+            if(rtReady){ cloudPull(); }
+        });
+    }catch(e){}
+}
+/* ---- apply an incoming payload {k, v} instantly ---- */
+function applyRemote(p){
+    if(!p||!p.k||p.from===DEVICE_ID) return;
+    const k=p.k, lsk=LS_KEY[k];
+    if(!lsk) return;
+    const localArr=JSON.parse(localStorage.getItem(lsk)||'[]');
+    const remoteArr=Array.isArray(p.v)?p.v:[];
+    const merged=mergeLists(k,localArr,remoteArr,false);
+    if(JSON.stringify(localArr)===JSON.stringify(merged)) return;
+    localStorage.setItem(lsk,JSON.stringify(merged));
+    STATE[k]=merged;
+    rerenderNow();
+}
+/* ---- write locally + push everywhere immediately ---- */
+function persist(k) {
+    const lsk=LS_KEY[k]||('hc_'+k);
+    localStorage.setItem(lsk, JSON.stringify(STATE[k]));
+    lastLocalWrite[k]=Date.now();
+    broadcastNow(k);
+    cloudPush(k);
+}
+function broadcastNow(k){
+    if(SYNC_KEYS.indexOf(k)===-1) return;
+    const payload={k:k,v:STATE[k]||[],from:DEVICE_ID,t:Date.now()};
+    try{ if(localChannel) localChannel.postMessage(payload); }catch(e){}
+    try{ if(rtChannel&&rtReady) rtChannel.send({type:'broadcast',event:'sync',payload:payload}); }catch(e){}
+}
+const pushTimers={};
+function cloudPush(k,immediate){
+    if(SYNC_KEYS.indexOf(k)===-1) return;
+    if(pushTimers[k]) clearTimeout(pushTimers[k]);
+    const run=()=>{ pushTimers[k]=null;
+        fetch(CLOUD_URL,{method:'POST',keepalive:true,headers:{'apikey':CLOUD_KEY,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'},body:JSON.stringify([{k:k,v:STATE[k]||[],updated_at:new Date().toISOString()}])}).catch(()=>{});
+    };
+    if(immediate) run(); else pushTimers[k]=setTimeout(run,120);
+}
+function cloudPushAll(immediate){ SYNC_KEYS.forEach(k=>cloudPush(k,immediate)); }
+let pulling=false;
+async function cloudPull(){
+    if(pulling) return false;
+    pulling=true;
+    try{
+        const res=await fetch(CLOUD_URL+'?select=k,v',{cache:'no-store',headers:{'apikey':CLOUD_KEY}});
+        if(!res.ok) return false;
+        const rows=await res.json();
+        let changed=false;
+        rows.forEach(row=>{
+            const k=row.k, lsk=LS_KEY[k];
+            if(!lsk) return;
+            const localArr=JSON.parse(localStorage.getItem(lsk)||'[]');
+            const remoteArr=Array.isArray(row.v)?row.v:[];
+            const recent=(Date.now()-(lastLocalWrite[k]||0))<2000;
+            const merged=mergeLists(k,localArr,remoteArr,recent);
+            if(JSON.stringify(localArr)!==JSON.stringify(merged)){
+                localStorage.setItem(lsk,JSON.stringify(merged));
+                changed=true;
+                if(merged.length!==remoteArr.length){ STATE[k]=merged; cloudPush(k,true); }
+            }
+        });
+        if(changed){ reloadState(); rerenderNow(); }
+        return changed;
+    }catch(e){ return false; }
+    finally{ pulling=false; }
+}
+function reloadState() {
+    SYNC_KEYS.forEach(k=>{ STATE[k]=JSON.parse(localStorage.getItem(LS_KEY[k])||'[]'); });
+}
+/* ---- instant re-render of the visible dashboard ---- */
+function rerenderNow(){
+    try{
+        if(!STATE.currentUser) return;
+        const home=document.getElementById('homeContent');
+        if(home&&home.style.display!=='none') return;
+        lastSignature=dataSignature();
+        if(typeof currentViewFn==='function') safeRender(currentViewFn);
+    }catch(e){}
+}
+if(localChannel){ localChannel.onmessage=(e)=>applyRemote(e.data); }
+/* ============== END REALTIME CLOUD SYNC ============== */
+function toast(msg) { const t=document.createElement('div'); t.className='toast'; t.textContent=msg; document.getElementById('toastContainer').appendChild(t); setTimeout(()=>t.remove(),3000); }
+function seedDemoData(){
+    if(!STATE.patients.length){
+        STATE.patients.push({name:'Sarah Johnson',email:'sarah@demo.com',password:'demo123',age:'28',focus:'pregnancy'});
+        persist('patients');
+        STATE.history.push({id:'demo_hist_1',email:'sarah@demo.com',date:new Date(Date.now()-864e5*90).toISOString(),type:'major',title:'Initial Consultation',desc:'First prenatal visit.'});
+        persist('history');
+        STATE.goals.push({email:'sarah@demo.com',date:new Date().toISOString().split('T')[0],goals:[{id:'g1',label:'Take prenatal vitamin',done:false},{id:'g2',label:'Drink 8 glasses of water',done:false}]});
+        persist('goals');
+    }
+    if(!STATE.doctors.length){
+        const docId='DR-'+Math.floor(1000+Math.random()*9000);
+        STATE.doctors.push({name:'Priya Sharma',email:'dr.sharma@demo.com',password:'demo123',specialization:'OB/GYN',doctorId:docId});
+        persist('doctors');
+    }
+    if(!STATE.connections.length){ STATE.connections.push({id:'c1',patientEmail:'sarah@demo.com',doctorEmail:'dr.sharma@demo.com',status:'approved'}); persist('connections'); }
+}
+function saveSession() { if(STATE.currentUser){ localStorage.setItem('hc_session',JSON.stringify({email:STATE.currentUser.email,role:STATE.currentUser.role})); } else { localStorage.removeItem('hc_session'); } }
+function restoreSession() {
+    // Disable automatic session restoration – user must log in every time.
+    return false;
+}
+function showHero() {
+    document.getElementById('homeContent').style.display='block';
+    document.getElementById('patientDashboard').classList.remove('active');
+    document.getElementById('doctorDashboard').classList.remove('active');
+    document.getElementById('navLinks').style.display='flex'; document.getElementById('navAuth').style.display='none';
+    STATE.currentUser=null; saveSession(); clearAutoRefresh();
+}
+function loginAs(user, role) {
+    STATE.currentUser={...user,role}; saveSession();
+    document.getElementById('homeContent').style.display='none';
+    document.getElementById('navLinks').style.display='none'; document.getElementById('navAuth').style.display='flex';
+    if(role==='patient'){
+        document.getElementById('patientDashboard').classList.add('active');
+        document.getElementById('doctorDashboard').classList.remove('active');
+        document.getElementById('patientName').textContent=user.name;
+        document.getElementById('navUserLabel').textContent='🩺 '+user.name;
+    } else {
+        document.getElementById('doctorDashboard').classList.add('active');
+        document.getElementById('patientDashboard').classList.remove('active');
+        document.getElementById('doctorName').textContent=user.name;
+        document.getElementById('doctorIdDisplay').textContent=user.doctorId;
+        document.getElementById('navUserLabel').textContent='👩‍⚕️ Dr. '+user.name;
+    }
+    document.getElementById('patientSubView').innerHTML='';
+    document.getElementById('doctorSubView').innerHTML='';
+    clearAutoRefresh();
+}
+function logout() { STATE.currentUser=null; saveSession(); showHero(); toast('👋 Logged out'); }
+let autoRefreshInterval=null; let currentViewFn=null;
+function clearAutoRefresh() { if(autoRefreshInterval){ clearInterval(autoRefreshInterval); autoRefreshInterval=null; } currentViewFn=null; lastSignature=null; }
+function isUserBusy(){
+    const overlay=document.getElementById('modalOverlay');
+    if(overlay&&overlay.classList.contains('active')) return true;
+    const a=document.activeElement;
+    if(!a) return false;
+    const t=a.tagName;
+    return t==='INPUT'||t==='TEXTAREA'||t==='SELECT'||a.isContentEditable;
+}
+function dataSignature(){
+    let sig='';
+    for(let i=0;i<localStorage.length;i++){
+        const k=localStorage.key(i);
+        if(k&&k.startsWith('hc_')) sig+=k+':'+(localStorage.getItem(k)||'').length+'|'+(localStorage.getItem(k)||'');
+    }
+    return sig;
+}
+var lastSignature=null;
+function safeRender(fn){
+    if(isUserBusy()) return;
+    const y=window.scrollY;
+    fn();
+    window.scrollTo(0,y);
+}
+function setAutoRefresh(fn) {
+    clearAutoRefresh(); currentViewFn=fn;
+    reloadState(); lastSignature=dataSignature();
+    autoRefreshInterval=setInterval(()=>{
+        if(document.hidden) return;
+        if(isUserBusy()) return;
+        if(!STATE.currentUser||document.getElementById('homeContent').style.display!=='none') return;
+        const sig=dataSignature();
+        if(sig===lastSignature) return;
+        lastSignature=sig;
+        reloadState();
+        safeRender(fn);
+    },400);
+}
+window.addEventListener('storage',(e)=>{
+    if(!e.key||!e.key.startsWith('hc_')) return;
+    if(!STATE.currentUser||document.getElementById('homeContent').style.display!=='none') return;
+    const sig=dataSignature();
+    if(sig===lastSignature) return;
+    lastSignature=sig;
+    reloadState();
+    if(currentViewFn) safeRender(currentViewFn);
+});
+function openModal(type) {
+    const overlay=document.getElementById('modalOverlay');
+    const content=document.getElementById('modalContent');
+    overlay.classList.add('active');
+    const role=type.includes('patient')?'patient':'doctor';
+    let html='';
+    if(type.includes('Login')){
+        html=`<div class="info-panel"><h2>Welcome Back</h2><p>Access your dashboard.</p></div>
+        <div class="form-panel"><h2>${role==='patient'?'🩺 Patient':'👩‍⚕️ Doctor'} Login</h2>
+        <input type="hidden" id="loginRole" value="${role}">
+        <div class="form-group"><label>Email</label><input type="email" id="loginEmail"></div>
+        <div class="form-group"><label>Password</label><input type="password" id="loginPassword"></div>
+        <button class="btn btn-filled" style="width:100%" onclick="handleLogin()">🔓 Login</button>
+        <p style="margin-top:12px;">Don't have an account? <a href="javascript:void(0)" onclick="openModal('${role}Register')">Register</a></p></div>`;
+    } else {
+        html=`<div class="info-panel"><h2>Join HerCare</h2><p>Start your journey.</p></div>
+        <div class="form-panel"><h2>${role==='patient'?'🩺 Patient':'👩‍⚕️ Doctor'} Register</h2>
+        <input type="hidden" id="regRole" value="${role}">
+        <div class="form-group"><label>Full Name</label><input type="text" id="regName"></div>
+        <div class="form-group"><label>Email</label><input type="email" id="regEmail"></div>
+        ${role==='patient'?`<div class="form-group"><label>Health Focus</label><select id="regFocus"><option>pregnancy</option><option>menstrual</option><option>general</option></select></div>`:`<div class="form-group"><label>Specialization</label><input type="text" id="regSpec"></div>`}
+        <button class="btn btn-filled" style="width:100%" onclick="handleRegister()">📧 Send OTP</button>
+        <p style="margin-top:12px;">Already registered? <a href="javascript:void(0)" onclick="openModal('${role}Login')">Login</a></p></div>`;
+    }
+    content.innerHTML=`<button class="close-btn" onclick="closeModal()">✕</button><div style="display:flex;flex-wrap:wrap;">${html}</div>`;
+}
+function closeModal() { document.getElementById('modalOverlay').classList.remove('active'); }
+function handleLogin() {
+    const role=document.getElementById('loginRole').value;
+    const email=document.getElementById('loginEmail').value.trim().toLowerCase();
+    const password=document.getElementById('loginPassword').value;
+    const store=role==='patient'?STATE.patients:STATE.doctors;
+    const user=store.find(u=>u.email===email&&u.password===password);
+    if(user){ closeModal(); loginAs(user,role); toast('✅ Welcome!'); } else toast('❌ Invalid credentials');
+}
+let otpResendTimer = null;
+
+function generateOtp() {
+    return String(Math.floor(100000 + Math.random() * 900000));
+}
+
+function emailJsConfigured() {
+    return EMAILJS_PUBLIC_KEY !== "YOUR_PUBLIC_KEY" &&
+           EMAILJS_SERVICE_ID !== "YOUR_SERVICE_ID" &&
+           EMAILJS_TEMPLATE_ID !== "YOUR_TEMPLATE_ID";
+}
+
+async function sendOtpEmail(email, name, role, otp) {
+    if (!emailJsConfigured()) {
+        throw new Error("EmailJS is not configured. Add your Public Key, Service ID and Template ID in the code.");
+    }
+
+    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+        to_email: email,
+        email: email,
+        otp: otp
+    });
+}
+
+function showOtpScreen(email) {
+    const stored = STATE.otpStore[email];
+    const name = stored?.formData?.name || "User";
+
+    document.getElementById('modalContent').innerHTML=`
+        <button class="close-btn" onclick="closeModal()">✕</button>
+        <div class="info-panel">
+            <h2>Verify Email</h2>
+            <p>We sent a 6-digit verification code to<br><strong>${email}</strong></p>
+            <p style="margin-top:12px;font-size:.85rem;">Check your inbox and spam folder.</p>
+        </div>
+        <div class="form-panel">
+            <h2>📧 Enter OTP</h2>
+            <div class="form-group">
+                <label>6-digit OTP</label>
+                <input type="text" id="otpInput" inputmode="numeric" autocomplete="one-time-code" placeholder="123456" maxlength="6" style="letter-spacing:6px;text-align:center;font-size:1.4rem;font-weight:700;">
+            </div>
+            <button class="btn btn-filled" style="width:100%" onclick="verifyOtp('${email}')">✅ Verify OTP</button>
+            <button id="resendOtpBtn" class="btn btn-outline" style="width:100%;margin-top:10px" onclick="resendOtp('${email}')" disabled>🔄 Resend OTP (60s)</button>
+            <div id="passwordSection" style="display:none;margin-top:20px;">
+                <div class="form-group">
+                    <label>Set Password</label>
+                    <input type="password" id="newPassword" minlength="6" autocomplete="new-password" placeholder="Minimum 6 characters">
+                </div>
+                <button class="btn btn-lavender" style="width:100%" onclick="finalizeRegistration('${email}')">🔒 Complete Registration</button>
+            </div>
+        </div>`;
+
+    startOtpResendTimer(60);
+    setTimeout(()=>document.getElementById('otpInput')?.focus(),100);
+}
+
+function startOtpResendTimer(seconds) {
+    clearInterval(otpResendTimer);
+    let remaining = seconds;
+    const btn = document.getElementById('resendOtpBtn');
+    if (!btn) return;
+    btn.disabled = true;
+    btn.textContent = `🔄 Resend OTP (${remaining}s)`;
+
+    otpResendTimer = setInterval(() => {
+        remaining--;
+        if (remaining <= 0) {
+            clearInterval(otpResendTimer);
+            btn.disabled = false;
+            btn.textContent = '🔄 Resend OTP';
+        } else {
+            btn.textContent = `🔄 Resend OTP (${remaining}s)`;
+        }
+    }, 1000);
+}
+
+async function resendOtp(email) {
+    const stored = STATE.otpStore[email];
+    if (!stored) {
+        toast('❌ Registration session expired');
+        return;
+    }
+
+    const otp = generateOtp();
+    stored.otp = otp;
+    stored.expiry = Date.now() + 300000;
+    stored.attempts = 0;
+
+    const btn = document.getElementById('resendOtpBtn');
+    if (btn) btn.disabled = true;
+
+    try {
+        await sendOtpEmail(email, stored.formData.name, stored.role, otp);
+        toast('📧 New OTP sent successfully');
+        startOtpResendTimer(60);
+    } catch (error) {
+        console.error('EmailJS resend error:', error);
+        toast('❌ Could not resend OTP. Check EmailJS settings.');
+        if (btn) {
+            btn.disabled = false;
+            btn.textContent = '🔄 Resend OTP';
+        }
+    }
+}
+
+async function handleRegister() {
+    const role=document.getElementById('regRole').value;
+    const name=document.getElementById('regName').value.trim();
+    const email=document.getElementById('regEmail').value.trim().toLowerCase();
+    const store=role==='patient'?STATE.patients:STATE.doctors;
+
+    if(!name){ toast('⚠️ Enter your full name'); return; }
+    if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ toast('⚠️ Enter a valid email'); return; }
+    if(store.find(u=>u.email===email)){ toast('⚠️ Email already registered'); return; }
+
+    if(!emailJsConfigured()){
+        toast('⚠️ Add your EmailJS keys first');
+        alert('EmailJS is not configured. Replace YOUR_PUBLIC_KEY, YOUR_SERVICE_ID and YOUR_TEMPLATE_ID near the top of the script.');
+        return;
+    }
+
+    const formData={name,email,role};
+    if(role==='patient') formData.focus=document.getElementById('regFocus')?.value;
+    else {
+        formData.specialization=document.getElementById('regSpec')?.value;
+        formData.doctorId='DR-'+Math.floor(1000+Math.random()*9000);
+    }
+
+    const otp=generateOtp();
+    STATE.otpStore[email]={otp,expiry:Date.now()+300000,role,formData,attempts:0};
+
+    const sendButton = document.querySelector('#modalContent .btn-filled');
+    if(sendButton){
+        sendButton.disabled=true;
+        sendButton.textContent='📧 Sending OTP...';
+    }
+
+    try {
+        await sendOtpEmail(email, name, role, otp);
+        toast('📧 OTP sent to your email');
+        showOtpScreen(email);
+    } catch(error) {
+        console.error('EmailJS error:', error);
+        delete STATE.otpStore[email];
+        toast('❌ Email could not be sent');
+        alert('Unable to send OTP. Check your EmailJS Service ID, Template ID, Public Key and email template.');
+        if(sendButton){
+            sendButton.disabled=false;
+            sendButton.textContent='📧 Send OTP';
+        }
+    }
+}
+
+function verifyOtp(email) {
+    const code=document.getElementById('otpInput').value.trim();
+    const stored=STATE.otpStore[email];
+
+    if(!/^\d{6}$/.test(code)){
+        toast('⚠️ Enter a valid 6-digit OTP');
+        return;
+    }
+
+    if(!stored){
+        toast('❌ OTP session not found');
+        return;
+    }
+
+    if(Date.now()>stored.expiry){
+        toast('❌ OTP expired. Please resend a new OTP');
+        return;
+    }
+
+    stored.attempts = (stored.attempts || 0) + 1;
+    if(stored.attempts > 5){
+        delete STATE.otpStore[email];
+        toast('❌ Too many attempts. Start registration again.');
+        return;
+    }
+
+    if(stored.otp!==code){
+        toast(`❌ Incorrect OTP (${5-stored.attempts} attempts left)`);
+        return;
+    }
+
+    stored.verified = true;
+    stored.expiry = Date.now() + 600000; // extend 10 min after verification
+    document.getElementById('passwordSection').style.display='block';
+    document.getElementById('otpInput').disabled=true;
+    document.querySelector('#modalContent .btn-filled').disabled=true;
+    const resendBtn=document.getElementById('resendOtpBtn');
+    if(resendBtn) resendBtn.style.display='none';
+    toast('✅ Email verified! Set your password.');
+    setTimeout(()=>{
+        const ps=document.getElementById('passwordSection');
+        if(ps) ps.scrollIntoView({behavior:'smooth',block:'center'});
+        document.getElementById('newPassword')?.focus();
+    },200);
+}
+function finalizeRegistration(email) {
+    const password=document.getElementById('newPassword').value;
+    if(!password||password.length<6){ toast('Password min 6 chars'); return; }
+    const stored=STATE.otpStore[email];
+    if(!stored || !stored.verified){ toast('❌ Verify your email first'); return; }
+    if(Date.now()>stored.expiry){ toast('❌ OTP verification expired. Please register again.'); return; }
+    const newUser={...stored.formData,password,createdAt:new Date().toISOString()};
+    if(stored.role==='patient'){ STATE.patients.push(newUser); persist('patients'); }
+    else { STATE.doctors.push(newUser); persist('doctors'); }
+    delete STATE.otpStore[email];
+    closeModal(); toast('🎉 Registration complete! Please login.');
+    openModal(stored.role==='patient'?'patientLogin':'doctorLogin');
+}
+function getConnectedDoctorEmail(patientEmail) {
+    const c = STATE.connections.find(c => c.patientEmail === patientEmail && c.status === 'approved');
+    return c ? c.doctorEmail : null;
+}
+function getConnectedPatientEmails(doctorEmail) {
+    const emails = STATE.connections.filter(c => c.doctorEmail === doctorEmail && c.status === 'approved').map(c => c.patientEmail);
+    return [...new Set(emails)];
+}
+function showConnections() {
+    const c=document.getElementById('patientSubView');
+    const patientEmail=STATE.currentUser.email;
+    const activeConn=STATE.connections.find(c=>c.patientEmail===patientEmail&&c.status!=='disconnected');
+    let html=`<div class="subview-card"><h3>🤝 My Doctor</h3>`;
+    if(activeConn){
+        const doc=STATE.doctors.find(d=>d.email===activeConn.doctorEmail);
+        html+=`<p>Connected with <strong>${doc?.name||activeConn.doctorEmail}</strong> (ID: ${doc?.doctorId||''}) - <span style="color:var(--rose-deep);font-weight:600;">${activeConn.status.toUpperCase()}</span></p>
+        <button class="btn btn-outline btn-sm" onclick="disconnectPatient('${activeConn.id}')">${activeConn.status==='pending'?'Cancel Request':'Disconnect'}</button>`;
+    } else {
+        html+=`<p>Search by name, email, or Doctor ID:</p>
+        <input type="text" id="doctorSearch" placeholder="e.g., DR-1234 or Dr. Sharma" oninput="filterDoctors()" style="margin-bottom:10px;width:100%;padding:10px;border:2px solid var(--gray-light);border-radius:var(--radius-sm);">
+        <div id="doctorList" style="max-height:250px;overflow-y:auto;">`;
+        STATE.doctors.forEach(doc=>{
+            html+=`<div class="doctor-option" style="display:flex;justify-content:space-between;padding:10px;background:#fff;margin:4px 0;border-radius:var(--radius-sm);">
+                <div><strong>${doc.name}</strong> (${doc.specialization||''})<br><small>ID: ${doc.doctorId}</small></div>
+                <button class="btn btn-sm btn-filled" onclick="sendConnectionRequest('${doc.email}')">Connect</button>
+            </div>`;
+        });
+        html+=`</div>`;
+    }
+    html+=`</div>`; c.innerHTML=html;
+    setAutoRefresh(showConnections);
+}
+function filterDoctors() { const s=document.getElementById('doctorSearch').value.toLowerCase(); document.querySelectorAll('#doctorList .doctor-option').forEach(el=>el.style.display=el.textContent.toLowerCase().includes(s)?'':'none'); }
+function sendConnectionRequest(doctorEmail) {
+    const p=STATE.currentUser.email;
+    let existing = STATE.connections.find(c=>c.patientEmail===p&&c.doctorEmail===doctorEmail);
+    if(existing) {
+        if(existing.status !== 'disconnected'){ toast('⚠️ Request already sent'); return; }
+        else {
+            existing.status = 'pending';
+            existing.updatedAt = Date.now();
+            persist('connections');
+            toast('📤 Request sent');
+            showConnections();
+            return;
+        }
+    }
+    STATE.connections.push({id:'c'+Date.now(),patientEmail:p,doctorEmail,status:'pending'});
+    persist('connections'); toast('📤 Request sent'); showConnections();
+}
+function disconnectPatient(connId) {
+    const conn=STATE.connections.find(c=>c.id===connId);
+    if(conn){
+        conn.status='disconnected';
+        conn.updatedAt=Date.now();
+        persist('connections');
+        if(STATE.currentUser.role==='patient') showConnections();
+        else showConnectionsDoc();
+        toast('Connection removed');
+    }
+}
+function showConnectionsDoc() {
+    const c=document.getElementById('doctorSubView');
+    const requests=STATE.connections.filter(c=>c.doctorEmail===STATE.currentUser.email&&c.status!=='disconnected');
+    let html=`<div class="subview-card"><h3>🤝 My Patients</h3>`;
+    if(requests.length===0) html+=`<p>No requests yet.</p>`;
+    else requests.forEach(req=>{
+        const pat=STATE.patients.find(p=>p.email===req.patientEmail);
+        html+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:#fff;margin:4px 0;border-radius:var(--radius-sm);">
+            <div><strong>${pat?.name||req.patientEmail}</strong></div>
+            <div>
+                ${req.status==='pending'
+                    ?`<button class="btn btn-sm btn-filled" onclick="approveConnection('${req.id}')" style="margin-right:8px;">Approve</button><button class="btn btn-sm btn-outline" onclick="disconnectPatient('${req.id}')">Reject</button>`
+                    :`<span style="color:var(--mint-deep);font-weight:600;margin-right:12px;">Approved</span><button class="btn btn-sm btn-outline" onclick="disconnectPatient('${req.id}')">Remove</button>`}
+            </div>
+        </div>`;
+    });
+    html+=`</div>`; c.innerHTML=html;
+    setAutoRefresh(showConnectionsDoc);
+}
+function approveConnection(connId) { const conn=STATE.connections.find(c=>c.id===connId); if(conn){ conn.status='approved'; conn.updatedAt=Date.now(); persist('connections'); showConnectionsDoc(); toast('✅ Approved'); } }
+function showChat() {
+    const c=document.getElementById('patientSubView');
+    const patientEmail=STATE.currentUser.email;
+    const doctorEmail=getConnectedDoctorEmail(patientEmail);
+    if(!doctorEmail){ c.innerHTML='<div class="subview-card"><h3>💬 Chat</h3><p>Connect to a doctor first.</p></div>'; return; }
+    renderChatUI(c,patientEmail,doctorEmail);
+    setAutoRefresh(()=>{ if(document.getElementById('chatMsgList')) renderChatUI(c,patientEmail,doctorEmail); });
+}
+function showChatDoc() {
+    const c=document.getElementById('doctorSubView');
+    const emails=getConnectedPatientEmails(STATE.currentUser.email);
+    if(!emails.length){ c.innerHTML='<div class="subview-card"><h3>💬 Chat</h3><p>No connected patients.</p></div>'; return; }
+    let html=`<div class="subview-card"><h3>💬 Chat</h3><select id="chatPatientSelect"><option value="">-- Select patient --</option>${emails.map(e=>`<option value="${e}">${STATE.patients.find(p=>p.email===e)?.name||e}</option>`).join('')}</select><div id="chatContent"></div></div>`;
+    c.innerHTML=html;
+    document.getElementById('chatPatientSelect').addEventListener('change',loadChatForPatient);
+    setAutoRefresh(()=>{ if(document.getElementById('chatPatientSelect')?.value) loadChatForPatient(); });
+}
+function loadChatForPatient() {
+    const select=document.getElementById('chatPatientSelect');
+    if(!select) return;
+    const email=select.value;
+    if(!email){ document.getElementById('chatContent').innerHTML=''; return; }
+    renderChatUI(document.getElementById('chatContent'),email,STATE.currentUser.email);
+}
+function renderChatUI(container,patientEmail,doctorEmail) {
+    const messages=STATE.chatMessages.filter(m=>(m.from===patientEmail&&m.to===doctorEmail)||(m.from===doctorEmail&&m.to===patientEmail)).sort((a,b)=>new Date(a.timestamp)-new Date(b.timestamp));
+    let html=`<div class="chat-messages" id="chatMsgList">`;
+    messages.forEach(m=>{
+        const sent=m.from===STATE.currentUser.email;
+        const senderName=m.from===patientEmail?(STATE.patients.find(p=>p.email===patientEmail)?.name||'Patient'):(STATE.doctors.find(d=>d.email===doctorEmail)?.name||'Doctor');
+        html+=`<div class="chat-bubble ${sent?'sent':'received'}"><strong>${sent?'You':senderName}:</strong> ${m.message}<br><small>${new Date(m.timestamp).toLocaleTimeString()}</small></div>`;
+    });
+    html+=`</div><div style="display:flex;gap:10px;"><input type="text" id="chatInput" placeholder="Type a message..." style="flex:1;padding:10px;border:2px solid var(--gray-light);border-radius:50px;">
+    <button class="btn btn-filled" onclick="sendChatMessage('${patientEmail}','${doctorEmail}')">Send</button></div>`;
+    container.innerHTML=html;
+    const msgList=document.getElementById('chatMsgList');
+    if(msgList) msgList.scrollTop=msgList.scrollHeight;
+}
+function sendChatMessage(patientEmail,doctorEmail) {
+    const input=document.getElementById('chatInput');
+    if(!input) return;
+    const msg=input.value.trim();
+    if(!msg) return;
+    const from=STATE.currentUser.email;
+    const to=STATE.currentUser.role==='patient'?doctorEmail:patientEmail;
+    STATE.chatMessages.push({id:'msg'+Date.now()+'_'+Math.random().toString(36).slice(2,8),from,to,message:msg,timestamp:new Date().toISOString()});
+    persist('chatMessages');
+    const container=document.getElementById('chatContent')||document.getElementById('patientSubView');
+    renderChatUI(container,patientEmail,doctorEmail);
+}
+function showDocuments() {
+    const c=document.getElementById('patientSubView');
+    const patientEmail=STATE.currentUser.email;
+    const docs=STATE.documents.filter(d=>d.patientEmail===patientEmail).sort((a,b)=>new Date(b.uploadedAt)-new Date(a.uploadedAt));
+    let html=`<div class="subview-card"><h3>📁 Document Vault</h3>
+    <div style="margin-bottom:20px;border:2px dashed var(--gray-light);border-radius:var(--radius-md);padding:30px;text-align:center;">
+        <input type="file" id="docUpload" accept=".pdf,.jpg,.jpeg,.png,.webp" style="display:none;">
+        <button class="btn btn-outline btn-sm" onclick="document.getElementById('docUpload').click()">📂 Upload File</button>
+        <p style="margin-top:8px;font-size:.8rem;color:var(--gray);">Max 500 KB per file · PDF, JPG, PNG</p>
+    </div>`;
+    if(!docs.length){
+        html+=`<p style="text-align:center;color:var(--gray);padding:20px;">No documents yet. Upload your first file above.</p>`;
+    }
+    docs.forEach(d=>{
+        const isImage=d.filename.match(/\.(jpg|jpeg|png|webp|gif)$/i);
+        html+=`<div style="background:#fff;border:1px solid var(--gray-light);border-radius:var(--radius-md);padding:16px;margin-bottom:12px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                <div>
+                    <strong style="color:var(--charcoal);">📄 ${d.filename}</strong>
+                    <div style="font-size:.78rem;color:var(--gray);">Uploaded by ${d.uploadedBy} · ${new Date(d.uploadedAt).toLocaleString()}</div>
+                </div>
+                <div style="display:flex;gap:8px;">
+                    <button class="btn btn-sm btn-outline" onclick="previewDocument('${d.id}')">👁 View</button>
+                    <button class="btn btn-sm btn-outline" style="color:#e74c3c;border-color:#e74c3c;" onclick="deleteDocument('${d.id}')">🗑</button>
+                </div>
+            </div>
+            ${isImage && d.dataUrl ? `<img src="${d.dataUrl}" style="max-width:100%;max-height:200px;border-radius:var(--radius-sm);border:1px solid var(--gray-light);cursor:pointer;" onclick="previewDocument('${d.id}')" alt="${d.filename}">` : ''}
+        </div>`;
+    });
+    html+=`</div>`; c.innerHTML=html;
+    document.getElementById('docUpload')?.addEventListener('change',function(e){ handleDocUpload(e, STATE.currentUser.email); });
+    setAutoRefresh(showDocuments);
+}
+function handleDocUpload(e, patientEmail) {
+    const file=e.target.files[0]; if(!file) return;
+    // Size check: localStorage has ~5MB limit, base64 adds ~33% overhead
+    if(file.size > 512000){
+        toast('⚠️ File too large! Max 500 KB.');
+        e.target.value='';
+        return;
+    }
+    const reader=new FileReader();
+    reader.onload=()=>{
+        try {
+            const docId='doc'+Date.now();
+            STATE.documents.push({id:docId, patientEmail:patientEmail, filename:file.name, dataUrl:reader.result, uploadedAt:new Date().toISOString(), uploadedBy:STATE.currentUser.role});
+            persist('documents');
+            toast('📄 Uploaded: '+file.name);
+            // Re-render the current view
+            if(STATE.currentUser.role==='patient') showDocuments();
+            else loadPatientDocuments();
+        } catch(err) {
+            console.error('Upload error:', err);
+            toast('❌ Storage full! Delete old files first.');
+        }
+    };
+    reader.onerror=()=>{ toast('❌ Could not read file'); };
+    reader.readAsDataURL(file);
+    e.target.value=''; // reset so same file can be re-selected
+}
+function previewDocument(docId) {
+    const doc=STATE.documents.find(d=>d.id===docId);
+    if(!doc || !doc.dataUrl){ toast('❌ Document data not found'); return; }
+    const isImage=doc.filename.match(/\.(jpg|jpeg|png|webp|gif)$/i);
+    const isPdf=doc.filename.match(/\.pdf$/i);
+    const overlay=document.getElementById('modalOverlay');
+    const content=document.getElementById('modalContent');
+    let previewHtml='';
+    if(isImage){
+        previewHtml=`<img src="${doc.dataUrl}" style="max-width:100%;max-height:70vh;border-radius:var(--radius-md);" alt="${doc.filename}">`;
+    } else if(isPdf){
+        previewHtml=`<iframe src="${doc.dataUrl}" style="width:100%;height:70vh;border:none;border-radius:var(--radius-md);"></iframe>`;
+    } else {
+        previewHtml=`<p style="padding:40px;text-align:center;color:var(--gray);">Preview not available for this file type.<br>
+        <a href="${doc.dataUrl}" download="${doc.filename}" class="btn btn-filled btn-sm" style="margin-top:16px;text-decoration:none;">⬇ Download File</a></p>`;
+    }
+    content.innerHTML=`<button class="close-btn" onclick="closeModal()">✕</button>
+        <div style="width:100%;padding:24px;">
+            <h3 style="font-family:var(--font-heading);color:var(--charcoal);margin-bottom:16px;">📄 ${doc.filename}
+                <span style="font-size:.8rem;font-weight:400;color:var(--gray);margin-left:12px;">${new Date(doc.uploadedAt).toLocaleString()}</span>
+            </h3>
+            ${previewHtml}
+            <div style="margin-top:16px;text-align:center;">
+                <a href="${doc.dataUrl}" download="${doc.filename}" class="btn btn-filled btn-sm" style="text-decoration:none;">⬇ Download</a>
+            </div>
+        </div>`;
+    overlay.classList.add('active');
+}
+function deleteDocument(docId) {
+    if(!confirm('Delete this document?')) return;
+    STATE.documents=STATE.documents.filter(d=>d.id!==docId);
+    persist('documents');
+    toast('🗑 Document deleted');
+    if(STATE.currentUser.role==='patient') showDocuments();
+    else loadPatientDocuments();
+}
+function viewDocument(docId) {
+    previewDocument(docId);
+}
+function showDocumentsDoc() {
+    const c=document.getElementById('doctorSubView');
+    const emails=getConnectedPatientEmails(STATE.currentUser.email);
+    let html=`<div class="subview-card"><h3>📁 Patient Documents</h3>
+    <select id="docPatientSelect"><option value="">-- Select patient --</option>${emails.map(e=>`<option value="${e}">${STATE.patients.find(p=>p.email===e)?.name||e}</option>`).join('')}</select>
+    <div id="docContent"></div></div>`;
+    c.innerHTML=html;
+    document.getElementById('docPatientSelect').addEventListener('change',loadPatientDocuments);
+    setAutoRefresh(()=>{ if(document.getElementById('docPatientSelect')?.value) loadPatientDocuments(); });
+}
+function loadPatientDocuments() {
+    const email=document.getElementById('docPatientSelect').value;
+    const content=document.getElementById('docContent');
+    if(!email){ content.innerHTML=''; return; }
+    const docs=STATE.documents.filter(d=>d.patientEmail===email).sort((a,b)=>new Date(b.uploadedAt)-new Date(a.uploadedAt));
+    let html=`<div style="margin:16px 0;border:2px dashed var(--gray-light);border-radius:var(--radius-md);padding:20px;text-align:center;">
+        <input type="file" id="docUploadDoc" accept=".pdf,.jpg,.jpeg,.png,.webp" style="display:none;">
+        <button class="btn btn-outline btn-sm" onclick="document.getElementById('docUploadDoc').click()">📂 Upload for this patient</button>
+        <p style="margin-top:6px;font-size:.78rem;color:var(--gray);">Max 500 KB · PDF, JPG, PNG</p>
+    </div>`;
+    if(!docs.length){
+        html+=`<p style="text-align:center;color:var(--gray);padding:16px;">No documents for this patient.</p>`;
+    }
+    docs.forEach(d=>{
+        const isImage=d.filename.match(/\.(jpg|jpeg|png|webp|gif)$/i);
+        html+=`<div style="background:#fff;border:1px solid var(--gray-light);border-radius:var(--radius-md);padding:16px;margin-bottom:12px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                <div>
+                    <strong style="color:var(--charcoal);">📄 ${d.filename}</strong>
+                    <div style="font-size:.78rem;color:var(--gray);">Uploaded by ${d.uploadedBy} · ${new Date(d.uploadedAt).toLocaleString()}</div>
+                </div>
+                <div style="display:flex;gap:8px;">
+                    <button class="btn btn-sm btn-outline" onclick="previewDocument('${d.id}')">👁 View</button>
+                    <button class="btn btn-sm btn-outline" style="color:#e74c3c;border-color:#e74c3c;" onclick="deleteDocument('${d.id}')">🗑</button>
+                </div>
+            </div>
+            ${isImage && d.dataUrl ? `<img src="${d.dataUrl}" style="max-width:100%;max-height:200px;border-radius:var(--radius-sm);border:1px solid var(--gray-light);cursor:pointer;" onclick="previewDocument('${d.id}')" alt="${d.filename}">` : ''}
+        </div>`;
+    });
+    content.innerHTML=html;
+    // Attach upload listener for doctor
+    const fileInput = document.getElementById('docUploadDoc');
+    if (fileInput) {
+        fileInput.addEventListener('change', function(e) {
+            const selectedEmail = document.getElementById('docPatientSelect').value;
+            if (!selectedEmail) { toast('No patient selected'); return; }
+            handleDocUpload(e, selectedEmail);
+        });
+    }
+}
+function showProgress() {
+    const c=document.getElementById('patientSubView');
+    const email=STATE.currentUser.email;
+    const today=new Date().toISOString().split('T')[0];
+    let gs=STATE.goals.find(g=>g.email===email&&g.date===today);
+    if(!gs){ gs={email,date:today,goals:[{id:'g1',label:'Take prenatal vitamin',done:false},{id:'g2',label:'Drink 8 glasses of water',done:false}]}; STATE.goals.push(gs); persist('goals'); }
+    const done=gs.goals.filter(g=>g.done).length, total=gs.goals.length;
+    const pct=total?Math.round((done/total)*100):0;
+    let html=`<div class="subview-card"><h3>🎯 Daily Progress</h3><div style="display:flex;align-items:center;gap:30px;flex-wrap:wrap;justify-content:center;">
+    <div style="position:relative;width:160px;height:160px;"><svg viewBox="0 0 160 160"><circle cx="80" cy="80" r="52" fill="none" stroke="#e8e0e4" stroke-width="10"/><circle cx="80" cy="80" r="52" fill="none" stroke="var(--rose-deep)" stroke-width="10" stroke-dasharray="${2*Math.PI*52}" stroke-dashoffset="${2*Math.PI*52*(1-pct/100)}" style="transition:0.8s"/></svg><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:700;">${pct}%</div></div>
+    <ul class="goal-list" style="flex:1;min-width:250px;">`;
+    gs.goals.forEach(g=>html+=`<li class="goal-item ${g.done?'done':''}" onclick="toggleGoal('${g.id}')"><div class="goal-checkbox">✓</div><span>${g.label}</span></li>`);
+    html+=`</ul></div></div>`; c.innerHTML=html;
+    setAutoRefresh(showProgress);
+}
+function toggleGoal(gid) {
+    const email=STATE.currentUser.email;
+    const today=new Date().toISOString().split('T')[0];
+    const gs=STATE.goals.find(g=>g.email===email&&g.date===today);
+    const goal=gs?.goals.find(g=>g.id===gid);
+    if(!goal) return;
+    goal.done=!goal.done; persist('goals'); showProgress();
+}
+function showProgressDoc() {
+    const c=document.getElementById('doctorSubView');
+    const emails=getConnectedPatientEmails(STATE.currentUser.email);
+    let html=`<div class="subview-card"><h3>🎯 Patient Goals</h3><select id="goalPatientSelect"><option value="">-- Select patient --</option>${emails.map(e=>`<option value="${e}">${STATE.patients.find(p=>p.email===e)?.name||e}</option>`).join('')}</select><div id="goalContent"></div></div>`;
+    c.innerHTML=html;
+    document.getElementById('goalPatientSelect').addEventListener('change',loadPatientGoals);
+    setAutoRefresh(()=>{ if(document.getElementById('goalPatientSelect')?.value) loadPatientGoals(); });
+}
+function loadPatientGoals() {
+    const email=document.getElementById('goalPatientSelect').value;
+    const content=document.getElementById('goalContent');
+    if(!email){ content.innerHTML=''; return; }
+    const today=new Date().toISOString().split('T')[0];
+    let gs=STATE.goals.find(g=>g.email===email&&g.date===today);
+    if(!gs){ gs={email,date:today,goals:[]}; STATE.goals.push(gs); persist('goals'); }
+    let html=`<ul class="goal-list">`;
+    gs.goals.forEach(g=>html+=`<li class="goal-item ${g.done?'done':''}"><div class="goal-checkbox">✓</div><span>${g.label}</span></li>`);
+    html+=`</ul><p>${gs.goals.filter(g=>g.done).length}/${gs.goals.length} completed</p>
+    <div style="display:flex;gap:10px;margin-top:12px;"><input type="text" id="newGoalLabel" placeholder="New goal..." style="flex:1;padding:8px;border:2px solid var(--gray-light);border-radius:50px;"><button class="btn btn-filled btn-sm" onclick="addGoalForPatient('${email}')">Add Goal</button></div>`;
+    content.innerHTML=html;
+}
+function addGoalForPatient(email) {
+    const label=document.getElementById('newGoalLabel')?.value.trim();
+    if(!label) return;
+    const today=new Date().toISOString().split('T')[0];
+    let gs=STATE.goals.find(g=>g.email===email&&g.date===today);
+    if(!gs){ gs={email,date:today,goals:[]}; STATE.goals.push(gs); }
+    gs.goals.push({id:'g'+Date.now(),label,done:false});
+    persist('goals'); loadPatientGoals(); toast('✅ Goal added');
+}
+function showTimeline() {
+    const c=document.getElementById('patientSubView');
+    const email=STATE.currentUser.email;
+    let events=STATE.history.filter(h=>h.email===email).sort((a,b)=>new Date(b.date)-new Date(a.date));
+    events = events.filter((e, i, a) => a.findIndex(x => (x.id && x.id === e.id) || (!x.id && !e.id && x.title === e.title && x.date === e.date)) === i); // Deduplicate fix
+   
+    let html=`<div class="subview-card"><h3>📋 Health Roadmap</h3>
+    <div style="background:#fff;border-radius:var(--radius-md);padding:20px;margin-bottom:24px;box-shadow:var(--shadow-sm);">
+      <h4>✏️ Add a Note</h4>
+      <input type="text" id="noteTitle" placeholder="Title" style="width:100%;margin-bottom:8px;padding:10px;border:2px solid var(--gray-light);border-radius:var(--radius-sm);">
+      <textarea id="noteDesc" rows="3" placeholder="Details..." style="width:100%;margin-bottom:8px;padding:10px;border:2px solid var(--gray-light);border-radius:var(--radius-sm);"></textarea>
+      <button class="btn btn-filled btn-sm" onclick="addManualNote()">Save Note</button>
+    </div>
+    <div class="timeline">`;
+    events.forEach(e=>html+=`<div class="timeline-item ${e.type}"><div>${new Date(e.date).toLocaleString()}</div><div><strong>${e.title}</strong></div><div>${e.desc}</div></div>`);
+    html+=`</div></div>`; c.innerHTML=html;
+}
+function addManualNote() {
+    const title=document.getElementById('noteTitle')?.value.trim();
+    const desc=document.getElementById('noteDesc')?.value.trim();
+    if(!title){ toast('Title required'); return; }
+    STATE.history.push({id:'hist'+Date.now(),email:STATE.currentUser.email,date:new Date().toISOString(),type:'minor',title,desc:desc||'',category:'manual'});
+    persist('history'); showTimeline(); toast('📝 Note added');
+}
+function showTimelineDoc() {
+    const c=document.getElementById('doctorSubView');
+    const emails=getConnectedPatientEmails(STATE.currentUser.email);
+    let html=`<div class="subview-card"><h3>📋 Patient History</h3><select id="patientSelect"><option value="">-- Select patient --</option>${emails.map(e=>`<option value="${e}">${STATE.patients.find(p=>p.email===e)?.name||e}</option>`).join('')}</select><div id="timelineContent"></div></div>`;
+    c.innerHTML=html;
+    document.getElementById('patientSelect').addEventListener('change',loadPatientTimeline);
+    setAutoRefresh(()=>{ if(document.getElementById('patientSelect')?.value) loadPatientTimeline(); });
+}
+function loadPatientTimeline() {
+    const email=document.getElementById('patientSelect').value;
+    const content=document.getElementById('timelineContent');
+    if(!email){ content.innerHTML=''; return; }
+    let events=STATE.history.filter(h=>h.email===email).sort((a,b)=>new Date(b.date)-new Date(a.date));
+    events = events.filter((e, i, a) => a.findIndex(x => (x.id && x.id === e.id) || (!x.id && !e.id && x.title === e.title && x.date === e.date)) === i); // Deduplicate fix
+   
+    let html=`<div class="timeline">`;
+    events.forEach(e=>html+=`<div class="timeline-item ${e.type}"><div>${new Date(e.date).toLocaleString()}</div><div><strong>${e.title}</strong></div><div>${e.desc}</div></div>`);
+    html+=`</div>
+    <div style="margin-top:16px;background:#fff;padding:16px;border-radius:var(--radius-md);">
+        <h4>Add Doctor's Note</h4>
+        <input type="text" id="docNoteTitle" placeholder="Note title" style="width:100%;margin-bottom:8px;padding:8px;border:2px solid var(--gray-light);border-radius:var(--radius-sm);">
+        <textarea id="docNoteDesc" rows="2" placeholder="Details..." style="width:100%;margin-bottom:8px;padding:8px;"></textarea>
+        <button class="btn btn-filled btn-sm" onclick="addDoctorNote('${email}')">Save Note</button>
+    </div>`;
+    content.innerHTML=html;
+}
+function addDoctorNote(email) {
+    const title=document.getElementById('docNoteTitle')?.value.trim();
+    const desc=document.getElementById('docNoteDesc')?.value.trim();
+    if(!title){ toast('Title required'); return; }
+    STATE.history.push({id:'hist'+Date.now(),email,date:new Date().toISOString(),type:'minor',title:`Dr. note: ${title}`,desc,category:'doctor'});
+    persist('history'); loadPatientTimeline(); toast('📝 Note added');
+}
+function showAppointments() {
+    const c=document.getElementById('patientSubView');
+    const apps=STATE.appointments.filter(a=>a.patientEmail===STATE.currentUser.email);
+    let html=`<div class="subview-card"><h3>📅 Appointments</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+      <div style="background:#fff;border-radius:var(--radius-md);padding:20px;">
+        <h4>🏥 Offline Checkup</h4>
+        <input type="date" id="offDate" style="width:100%;margin-bottom:10px;padding:10px;border:2px solid var(--gray-light);border-radius:var(--radius-sm);">
+        <div class="slot-grid" id="offSlots">${['09:00','10:00','11:00','02:00','03:30'].map(s=>`<div class="slot-btn" onclick="selectSlot(this,'offline','${s}')">${s}</div>`).join('')}</div>
+        <button class="btn btn-filled btn-sm" style="margin-top:12px;" onclick="bookAppt('offline')">Book Offline</button>
+      </div>
+      <div style="background:#fff;border-radius:var(--radius-md);padding:20px;">
+        <h4>💻 Online Consult</h4>
+        <input type="date" id="onDate" style="width:100%;margin-bottom:10px;padding:10px;border:2px solid var(--gray-light);border-radius:var(--radius-sm);">
+        <div class="slot-grid" id="onSlots">${['09:00','10:00','11:00','02:00','03:30'].map(s=>`<div class="slot-btn" onclick="selectSlot(this,'online','${s}')">${s}</div>`).join('')}</div>
+        <button class="btn btn-lavender btn-sm" style="margin-top:12px;" onclick="bookAppt('online')">Book Online</button>
+      </div>
+    </div>
+    <h4 style="margin-top:24px;">Upcoming</h4>`;
+    apps.forEach(a=>html+=`<div style="display:flex;justify-content:space-between;padding:10px;background:#fff;margin:4px 0;border-radius:var(--radius-sm);"><span>${a.type==='offline'?'🏥':'💻'} ${new Date(a.date).toLocaleDateString()} at ${a.slot}</span><span>${a.status}</span></div>`);
+    html+=`</div>`; c.innerHTML=html;
+}
+window.selectedSlots={offline:null,online:null};
+function selectSlot(btn,type,slot) {
+    const container=document.getElementById(type==='offline'?'offSlots':'onSlots');
+    container.querySelectorAll('.slot-btn').forEach(b=>b.classList.remove('selected'));
+    btn.classList.add('selected');
+    window.selectedSlots[type]=slot;
+}
+function bookAppt(type) {
+    const date=document.getElementById(type==='offline'?'offDate':'onDate').value;
+    const slot=window.selectedSlots[type];
+    if(!date||!slot){ toast('Please select date and time slot'); return; }
+    STATE.appointments.push({id:'apt'+Date.now(),patientEmail:STATE.currentUser.email,type,date,slot,status:'pending',createdAt:new Date().toISOString()});
+    persist('appointments'); toast('📅 Appointment requested'); showAppointments();
+}
+function showAppointmentsDoc() {
+    const c=document.getElementById('doctorSubView');
+    const connected=getConnectedPatientEmails(STATE.currentUser.email);
+    const apps=STATE.appointments.filter(a=>connected.includes(a.patientEmail));
+    let html='<div class="subview-card"><h3>📅 Appointment Requests</h3>';
+    apps.forEach(a=>{
+        const p=STATE.patients.find(p=>p.email===a.patientEmail);
+        const typeLabel = a.type === 'offline' ? '🏥 Offline' : '💻 Online';
+        html+=`<div style="display:flex;justify-content:space-between;padding:10px;background:#fff;margin:4px 0;border-radius:var(--radius-sm);">
+            ${p?.name||a.patientEmail} - ${typeLabel} ${new Date(a.date).toLocaleDateString()} ${a.slot} (${a.status}) 
+            ${a.status==='pending'?`<button class="btn btn-sm btn-filled" onclick="approveAppt('${a.id}')">Approve</button>`:''}
+        </div>`;
+    });
+    html+='</div>'; c.innerHTML=html;
+    setAutoRefresh(showAppointmentsDoc);
+}
+function approveAppt(id) { const a=STATE.appointments.find(a=>a.id===id); if(a){a.status='approved'; persist('appointments'); showAppointmentsDoc(); toast('Approved');} }
+function showVideoCall() {
+    clearAutoRefresh();
+    const c=getSubContainer();
+    c.innerHTML=`<div class="subview-card" style="background:#1a1a2e;color:#fff;text-align:center;">
+        <h3>📹 Video Consultation</h3><p>Waiting room</p>
+        <div style="display:flex;gap:30px;justify-content:center;align-items:center;margin:20px 0;">
+            <div><div style="width:70px;height:70px;border-radius:50%;background:linear-gradient(135deg,var(--rose),var(--lavender));display:flex;align-items:center;justify-content:center;font-size:2rem;">${STATE.currentUser.role==='patient'?'🩺':'👩‍⚕️'}</div><p>You</p></div>
+            <div>↔</div>
+            <div><div style="width:70px;height:70px;border-radius:50%;background:#444;display:flex;align-items:center;justify-content:center;font-size:2rem;">${STATE.currentUser.role==='patient'?'👩‍⚕️':'🩺'}</div><p>${STATE.currentUser.role==='patient'?'Dr. Sharma':'Patient'}</p></div>
+        </div>
+        <button class="btn btn-filled btn-lg" onclick="startFakeCall()">📹 Join Call Room</button>
+    </div>`;
+}
+function startFakeCall() {
+    const c=getSubContainer();
+    c.innerHTML=`<div class="subview-card" style="background:#1a1a2e;color:#fff;text-align:center;">
+        <h3>🔴 Live Call</h3><p style="color:#8f8;">● Connected 00:12</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:20px 0;">
+            <div style="aspect-ratio:4/3;background:#252540;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:3rem;">${STATE.currentUser.role==='patient'?'🩺':'👩‍⚕️'}</div>
+            <div style="aspect-ratio:4/3;background:#252540;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:3rem;">${STATE.currentUser.role==='patient'?'👩‍⚕️':'🩺'}</div>
+        </div>
+        <div style="display:flex;gap:16px;justify-content:center;">
+            <button class="btn btn-outline" style="width:50px;height:50px;border-radius:50%;">🎤</button>
+            <button class="btn btn-outline" style="width:50px;height:50px;border-radius:50%;">📷</button>
+            <button class="btn btn-filled" style="background:#e74c3c;width:60px;height:60px;border-radius:50%;" onclick="showVideoCall()">📞</button>
+        </div>
+    </div>`;
+}
+function getSubContainer() { return STATE.currentUser.role==='patient'?document.getElementById('patientSubView'):document.getElementById('doctorSubView'); }
+window.addEventListener('DOMContentLoaded',async ()=>{
+    initRealtime();              // open the live websocket first
+    await cloudPull();           // get everything other devices already created
+    seedDemoData();              // only fills in demo accounts if nothing exists anywhere
+    cloudPushAll(true);          // make sure this device's data is on the cloud too
+    showHero();                  // always show home page, never auto-login
+    // safety net: light reconciliation poll (fast when the socket is down)
+    setInterval(()=>{ if(document.hidden) return; if(!rtReady||Math.random()<0.15) cloudPull(); },1200);
+    document.addEventListener('visibilitychange',()=>{ if(!document.hidden){ cloudPull(); if(!rtReady) initRealtime(); } });
+    window.addEventListener('online',()=>{ cloudPull(); cloudPushAll(true); if(!rtReady) initRealtime(); });
+    window.addEventListener('pagehide',()=>{ cloudPushAll(true); });
+});
+</script>
+</body>
+</html>
